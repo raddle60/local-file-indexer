@@ -240,7 +240,7 @@ public class SearchPane extends JPanel {
                                 textArea.getCaret().setDot(0);
                                 currentSearchContext.setSearchForward(true);
                                 org.fife.ui.rtextarea.SearchResult find = SearchEngine.find(textArea, currentSearchContext);
-                                markLeb.setText("匹配：" + find.getMarkedCount());
+                                markLeb.setText("匹配数：" + find.getMarkedCount());
                             } catch (Exception e1) {
                                 e1.printStackTrace();
                             }
