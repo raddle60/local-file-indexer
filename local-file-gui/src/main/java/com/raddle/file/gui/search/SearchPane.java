@@ -158,6 +158,7 @@ public class SearchPane extends JPanel {
 
         textArea = new RSyntaxTextArea();
         textArea.setEditable(false);
+        textArea.setMarkOccurrences(true);
         sp = new RTextScrollPane(textArea);
 
         resultTable = new JTable();
