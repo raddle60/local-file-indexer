@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -113,7 +112,7 @@ public class SearchPane extends JPanel {
     /**
      * Create the panel.
      */
-    public SearchPane(){
+    public SearchPane() {
         initialize();
     }
 
@@ -237,15 +236,11 @@ public class SearchPane extends JPanel {
                                 Reader r = new StringReader(content);
                                 textArea.read(r, null);
                                 r.close();
-                                textArea.clearMarkAllHighlights();
-                                textArea.getCaret().setDot(0);
-                                int markAll = textArea.markAll(currentSearchContext.getSearchFor(), currentSearchContext.getMatchCase(), currentSearchContext.getWholeWord(), currentSearchContext.isRegularExpression());
-                                markLeb.setText("匹配：" + markAll);
                                 // 定位到第一个
                                 textArea.getCaret().setDot(0);
                                 currentSearchContext.setSearchForward(true);
-                                SearchEngine.find(textArea, currentSearchContext);
-                                textArea.getCaret().setDot(Math.max(textArea.getCaret().getDot(), textArea.getCaret().getMark()));
+                                org.fife.ui.rtextarea.SearchResult find = SearchEngine.find(textArea, currentSearchContext);
+                                markLeb.setText("匹配：" + find.getMarkedCount());
                             } catch (Exception e1) {
                                 e1.printStackTrace();
                             }
@@ -408,7 +403,6 @@ public class SearchPane extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 currentSearchContext.setSearchForward(false);
                 SearchEngine.find(textArea, currentSearchContext);
-                textArea.getCaret().setDot(Math.min(textArea.getCaret().getDot(), textArea.getCaret().getMark()));
             }
         });
         filePreBtn.setBounds(553, 9, 73, 23);
@@ -421,7 +415,6 @@ public class SearchPane extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 currentSearchContext.setSearchForward(true);
                 SearchEngine.find(textArea, currentSearchContext);
-                textArea.getCaret().setDot(Math.max(textArea.getCaret().getDot(), textArea.getCaret().getMark()));
             }
         });
         fileNextBtn.setBounds(636, 9, 73, 23);
@@ -599,7 +592,9 @@ public class SearchPane extends JPanel {
         DefaultTableModel model = (DefaultTableModel) resultTable.getModel();
         model.getDataVector().removeAllElements();
         for (Map<IndexedField, Object> result : results) {
-            model.addRow(new Object[] { result.get(IndexedField.NAME), result.get(IndexedField.EXTENSION), readAbleSize(Long.parseLong((String) result.get(IndexedField.LENGTH))), result.get(IndexedField.ENCODING), formatDate(Long.parseLong((String) result.get(IndexedField.MODIFIED))), result.get(IndexedField.PATH) });
+            model.addRow(new Object[] { result.get(IndexedField.NAME), result.get(IndexedField.EXTENSION),
+                    readAbleSize(Long.parseLong((String) result.get(IndexedField.LENGTH))), result.get(IndexedField.ENCODING),
+                    formatDate(Long.parseLong((String) result.get(IndexedField.MODIFIED))), result.get(IndexedField.PATH) });
         }
         TableUtils.FitTableColumns(resultTable);
         resultTable.repaint();
@@ -659,8 +654,7 @@ public class SearchPane extends JPanel {
                     selectedIndexNames.add(indexConfig.getName());
                 }
             } else {
-                JOptionPane.showMessageDialog(SearchPane.this, "索引目录，" + new File(indexConfig.getIndexSaveDir()).getAbsolutePath()
-                        + ", 不存在");
+                JOptionPane.showMessageDialog(SearchPane.this, "索引目录，" + new File(indexConfig.getIndexSaveDir()).getAbsolutePath() + ", 不存在");
             }
         }
         if (dirs.size() == 0) {
@@ -681,14 +675,6 @@ public class SearchPane extends JPanel {
             JOptionPane.showMessageDialog(SearchPane.this, "关键字为空");
             return;
         }
-        // 高亮
-        if (highLightChk.isSelected()) {
-            textArea.getCaret().setDot(0);
-            int markAll = textArea.markAll(fileKeyworkTxt.getText(), false, false, regexChk.isSelected());
-            markLeb.setText("匹配数：" + markAll);
-        } else {
-            markLeb.setText("匹配数：");
-        }
         textArea.getCaret().setDot(0);
         currentSearchContext.setSearchFor(fileKeyworkTxt.getText());
         currentSearchContext.setMatchCase(false);
@@ -696,8 +682,8 @@ public class SearchPane extends JPanel {
         currentSearchContext.setSearchForward(true);
         currentSearchContext.setWholeWord(false);
         try {
-            SearchEngine.find(textArea, currentSearchContext);
-            textArea.getCaret().setDot(Math.max(textArea.getCaret().getDot(), textArea.getCaret().getMark()));
+            org.fife.ui.rtextarea.SearchResult find = SearchEngine.find(textArea, currentSearchContext);
+            markLeb.setText("匹配数：" + find.getMarkedCount());
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(SearchPane.this, "搜索失败，" + e.getMessage());
@@ -709,7 +695,23 @@ public class SearchPane extends JPanel {
         List<String> quotedKeywords = new ArrayList<String>();
         for (String string : parsedKeywords) {
             // 对正则表达式的关键字做转义
-            quotedKeywords.add(Pattern.quote(string));
+            String quote = StringUtils.replace(string, "$", "$");
+            quote = StringUtils.replace(quote, "(", "\\(");
+            quote = StringUtils.replace(quote, ")", "\\)");
+            quote = StringUtils.replace(quote, "*", "\\*");
+            quote = StringUtils.replace(quote, "+", "\\+");
+            quote = StringUtils.replace(quote, ".", "\\.");
+            quote = StringUtils.replace(quote, "[", "\\[");
+            quote = StringUtils.replace(quote, "]", "\\]");
+            quote = StringUtils.replace(quote, "?", "\\?");
+            quote = StringUtils.replace(quote, "\\", "\\\\");
+            quote = StringUtils.replace(quote, "^", "\\^");
+            quote = StringUtils.replace(quote, "{", "\\{");
+            quote = StringUtils.replace(quote, "}", "\\}");
+            quote = StringUtils.replace(quote, "|", "\\|");
+            quote = StringUtils.replace(quote, "'", "\\'");
+            quote = StringUtils.replace(quote, "\"", "\\\"");
+            quotedKeywords.add(quote);
         }
         return quotedKeywords;
     }
@@ -799,14 +801,16 @@ public class SearchPane extends JPanel {
                         if (file.exists()) {
                             if (textFileExts.contains(FilenameUtils.getExtension(file.getName()))) {
                                 if (file.length() > MAX_TEXT_CONTENT_SIZE) {
-                                    if (JOptionPane.showConfirmDialog(SearchPane.this, file.getAbsolutePath() + "," + readAbleSize(file.length()) + ",文件过大,是否跳过") != JOptionPane.OK_OPTION) {
+                                    if (JOptionPane.showConfirmDialog(SearchPane.this, file.getAbsolutePath() + "," + readAbleSize(file.length())
+                                            + ",文件过大,是否跳过") != JOptionPane.OK_OPTION) {
                                         continue;
                                     }
                                 }
                                 try {
                                     byte[] bytes = FileUtils.readFileToByteArray(file);
                                     String content = new String(bytes, StringUtils.defaultIfBlank(CharSetUtils.detectCharset(bytes), "ISO-8859-1"));
-                                    if (content.contains(resultKeyword.getText()) || name.contains(resultKeyword.getText()) || path.contains(resultKeyword.getText())) {
+                                    if (content.contains(resultKeyword.getText()) || name.contains(resultKeyword.getText())
+                                            || path.contains(resultKeyword.getText())) {
                                         matchedResults.add(config);
                                     }
                                 } catch (Exception e1) {
