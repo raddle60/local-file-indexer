@@ -573,10 +573,9 @@ public class SearchPane extends JPanel {
         refreshResultTable(results, totalCount, spentTime);
         searchInResultBtn.setEnabled(true);
         //
-        List<String> quotedKeywords = getQuotedKeyword(keywordTxt.getText());
-        currentSearchContext.setSearchFor(StringUtils.join(quotedKeywords, "|"));
+        currentSearchContext.setSearchFor(keywordTxt.getText());
         currentSearchContext.setMatchCase(false);
-        currentSearchContext.setRegularExpression(true);
+        currentSearchContext.setRegularExpression(false);
         currentSearchContext.setSearchForward(true);
         currentSearchContext.setWholeWord(false);
         //
@@ -689,32 +688,6 @@ public class SearchPane extends JPanel {
             e.printStackTrace();
             JOptionPane.showMessageDialog(SearchPane.this, "搜索失败，" + e.getMessage());
         }
-    }
-
-    private List<String> getQuotedKeyword(String keywords) {
-        String[] parsedKeywords = luceneSearchManager.parseForInFileSearch(keywords);
-        List<String> quotedKeywords = new ArrayList<String>();
-        for (String string : parsedKeywords) {
-            // 对正则表达式的关键字做转义
-            String quote = StringUtils.replace(string, "$", "$");
-            quote = StringUtils.replace(quote, "(", "\\(");
-            quote = StringUtils.replace(quote, ")", "\\)");
-            quote = StringUtils.replace(quote, "*", "\\*");
-            quote = StringUtils.replace(quote, "+", "\\+");
-            quote = StringUtils.replace(quote, ".", "\\.");
-            quote = StringUtils.replace(quote, "[", "\\[");
-            quote = StringUtils.replace(quote, "]", "\\]");
-            quote = StringUtils.replace(quote, "?", "\\?");
-            quote = StringUtils.replace(quote, "\\", "\\\\");
-            quote = StringUtils.replace(quote, "^", "\\^");
-            quote = StringUtils.replace(quote, "{", "\\{");
-            quote = StringUtils.replace(quote, "}", "\\}");
-            quote = StringUtils.replace(quote, "|", "\\|");
-            quote = StringUtils.replace(quote, "'", "\\'");
-            quote = StringUtils.replace(quote, "\"", "\\\"");
-            quotedKeywords.add(quote);
-        }
-        return quotedKeywords;
     }
 
     public void updateOutFrameTitle() {
