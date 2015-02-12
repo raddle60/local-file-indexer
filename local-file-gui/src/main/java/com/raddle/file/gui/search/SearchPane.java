@@ -106,6 +106,7 @@ public class SearchPane extends JPanel {
     private JLabel charsetLeb;
     private final JPopupMenu resultTableMenu = new JPopupMenu();
     private Point resultTablePopPoint = null;
+    private JMenuItem copyFileNameNoExt;
     private JMenuItem copyFileName;
     private JMenuItem copyFilePath;
 
@@ -172,9 +173,11 @@ public class SearchPane extends JPanel {
                     resultTablePopPoint = new Point(e.getX(), e.getY());
                     int row = resultTable.rowAtPoint(resultTablePopPoint);
                     if (ArrayUtils.contains(resultTable.getSelectedRows(), row)) {
+                        copyFileNameNoExt.setEnabled(true);
                         copyFileName.setEnabled(true);
                         copyFilePath.setEnabled(true);
                     } else {
+                        copyFileNameNoExt.setEnabled(false);
                         copyFileName.setEnabled(false);
                         copyFilePath.setEnabled(false);
                     }
@@ -301,6 +304,38 @@ public class SearchPane extends JPanel {
             }
         });
         resultTableMenu.add(openCmd);
+        copyFileNameNoExt = new JMenuItem("复制文件名(无扩展名)");
+        copyFileNameNoExt.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int[] selectedRows = resultTable.getSelectedRows();
+                StringWriter stringWriter = new StringWriter();
+                BufferedWriter writer = new BufferedWriter(stringWriter);
+                for (int row : selectedRows) {
+                    Map<IndexedField, Object> map = currentResults.get(row);
+                    String name = (String) map.get(IndexedField.NAME);
+                    try {
+                        if (stringWriter.getBuffer().length() > 0) {
+                            writer.newLine();
+                        }
+                        writer.write(name);
+                        writer.flush();
+                    } catch (IOException e1) {
+                    }
+                }
+                try {
+                    writer.close();
+                } catch (IOException e1) {
+                }
+                System.out.println(stringWriter);
+                // 放入剪切板
+                Clipboard sysClip = Toolkit.getDefaultToolkit().getSystemClipboard();
+                Transferable tText = new StringSelection(stringWriter.toString());
+                sysClip.setContents(tText, null);
+            }
+        });
+        resultTableMenu.add(copyFileNameNoExt);
         copyFileName = new JMenuItem("复制文件名");
         copyFileName.addActionListener(new ActionListener() {
 
