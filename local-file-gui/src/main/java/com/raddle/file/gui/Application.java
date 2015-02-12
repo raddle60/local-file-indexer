@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Frame;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -14,13 +16,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -83,6 +86,8 @@ public class Application {
         frame.setTitle("本地文件索引");
         frame.setBounds(100, 100, 818, 492);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Image image=Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/icon.png"));
+        frame.setIconImage(image);
 
         JMenuBar menuBar = new JMenuBar();
         frame.setJMenuBar(menuBar);
@@ -98,7 +103,7 @@ public class Application {
                 if (indexManagerFrame == null) {
                     indexManagerFrame = new IndexManagerDialog();
                     indexManagerFrame.setLocationRelativeTo(frame);
-                    indexManagerFrame.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
+                    indexManagerFrame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
                     indexManagerFrame.setConfigManager(configManager);
                     indexManagerFrame.setModal(true);
                     indexManagerFrame.initData();
@@ -130,7 +135,7 @@ public class Application {
             @Override
             public void actionPerformed(ActionEvent e) {
                 OptionDialog dialog = new OptionDialog();
-                dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                 dialog.setTitle("全局选项");
                 dialog.setConfigManager(configManager);
                 dialog.initData();
@@ -143,7 +148,7 @@ public class Application {
         menu.add(menuItem);
         frame.getContentPane().setLayout(new BorderLayout(0, 0));
 
-        tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane = new JTabbedPane(SwingConstants.TOP);
         tabbedPane.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
