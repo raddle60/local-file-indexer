@@ -109,6 +109,8 @@ public class SearchPane extends JPanel {
     private JMenuItem copyFileNameNoExt;
     private JMenuItem copyFileName;
     private JMenuItem copyFilePath;
+    private JLabel label_1;
+    private JTextField resultExcludeTxt;
 
     /**
      * Create the panel.
@@ -424,10 +426,12 @@ public class SearchPane extends JPanel {
         fileKeyworkTxt.setColumns(10);
 
         regexChk = new JCheckBox("是否正则");
+        regexChk.setToolTipText("是否正则");
         regexChk.setBounds(6, 9, 79, 23);
         panel.add(regexChk);
 
         highLightChk = new JCheckBox("是否高亮");
+        highLightChk.setToolTipText("是否高亮");
         highLightChk.setSelected(true);
         highLightChk.setBounds(87, 9, 73, 23);
         panel.add(highLightChk);
@@ -526,7 +530,7 @@ public class SearchPane extends JPanel {
                 }
             }
         });
-        resultKeyword.setBounds(10, 35, 392, 21);
+        resultKeyword.setBounds(54, 35, 250, 21);
         add(resultKeyword);
         resultKeyword.setColumns(10);
 
@@ -539,7 +543,7 @@ public class SearchPane extends JPanel {
             }
         });
         searchInResultBtn.setToolTipText("不用索引，全文件逐字遍历");
-        searchInResultBtn.setBounds(412, 34, 126, 23);
+        searchInResultBtn.setBounds(573, 34, 126, 23);
         searchInResultBtn.setEnabled(false);
         add(searchInResultBtn);
 
@@ -557,9 +561,31 @@ public class SearchPane extends JPanel {
                 searchInResultBtn.setText("结果内搜索");
             }
         });
-        searchInResultResetBtn.setBounds(548, 34, 71, 23);
+        searchInResultResetBtn.setBounds(722, 34, 71, 23);
         searchInResultResetBtn.setEnabled(false);
         add(searchInResultResetBtn);
+        
+        JLabel label = new JLabel("包含");
+        label.setBounds(10, 37, 41, 17);
+        add(label);
+        
+        label_1 = new JLabel("排除");
+        label_1.setBounds(307, 37, 55, 17);
+        add(label_1);
+        
+        resultExcludeTxt = new JTextField();
+        resultExcludeTxt.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    searchInResult();
+                }
+            }
+        });
+        resultExcludeTxt.setBounds(347, 35, 205, 21);
+        add(resultExcludeTxt);
+        resultExcludeTxt.setColumns(10);
 
         addMouseListener(new MouseAdapter() {
 
@@ -780,7 +806,7 @@ public class SearchPane extends JPanel {
 
     @SuppressWarnings("unchecked")
     private void searchInResult() {
-        if (StringUtils.isEmpty(resultKeyword.getText())) {
+        if (StringUtils.isEmpty(resultKeyword.getText()) && StringUtils.isEmpty(resultExcludeTxt.getText())) {
             JOptionPane.showMessageDialog(SearchPane.this, "关键字为空");
             return;
         }
@@ -818,8 +844,18 @@ public class SearchPane extends JPanel {
                                 try {
                                     byte[] bytes = FileUtils.readFileToByteArray(file);
                                     String content = new String(bytes, StringUtils.defaultIfBlank(CharSetUtils.detectCharset(bytes), "ISO-8859-1"));
-                                    if (content.contains(resultKeyword.getText()) || name.contains(resultKeyword.getText())
-                                            || path.contains(resultKeyword.getText())) {
+                                    if (StringUtils.isNotEmpty(resultExcludeTxt.getText())) {
+                                        if (content.contains(resultExcludeTxt.getText()) || name.contains(resultExcludeTxt.getText())
+                                                || path.contains(resultExcludeTxt.getText())) {
+                                            continue;
+                                        }
+                                    }
+                                    if (StringUtils.isNotEmpty(resultKeyword.getText())) {
+                                        if (content.contains(resultKeyword.getText()) || name.contains(resultKeyword.getText())
+                                                || path.contains(resultKeyword.getText())) {
+                                            matchedResults.add(config);
+                                        }
+                                    } else {
                                         matchedResults.add(config);
                                     }
                                 } catch (Exception e1) {
