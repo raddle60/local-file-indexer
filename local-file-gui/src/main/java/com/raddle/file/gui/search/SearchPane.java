@@ -641,6 +641,7 @@ public class SearchPane extends JPanel {
         currentSearchContext.setWholeWord(false);
         //
         resultKeyword.setText(keywordTxt.getText());
+        resultExcludeTxt.setText("");
         fileKeyworkTxt.setText(keywordTxt.getText());
         inResultSearchTimes = 0;
         searchInResultBtn.setText("结果内搜索");
