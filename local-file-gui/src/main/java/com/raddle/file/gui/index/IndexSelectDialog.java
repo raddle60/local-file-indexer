@@ -12,6 +12,9 @@ import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.WindowConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import com.raddle.config.ConfigManager;
@@ -25,6 +28,7 @@ public class IndexSelectDialog extends JDialog {
     private ConfigManager configManager;
     private JCheckBox checkBox;
     private List<String> selectedIndexs;
+    private JCheckBox isMultiSelect;
 
     /**
      * Launch the application.
@@ -36,7 +40,7 @@ public class IndexSelectDialog extends JDialog {
             public void run() {
                 try {
                     IndexSelectDialog dialog = new IndexSelectDialog();
-                    dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                    dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                     dialog.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -49,7 +53,7 @@ public class IndexSelectDialog extends JDialog {
      * Create the dialog.
      */
     public IndexSelectDialog(){
-        setBounds(100, 100, 563, 351);
+        setBounds(100, 100, 563, 337);
         getContentPane().setLayout(null);
 
         JScrollPane scrollPane = new JScrollPane();
@@ -57,6 +61,18 @@ public class IndexSelectDialog extends JDialog {
         getContentPane().add(scrollPane);
 
         indexTable = new JTable();
+        indexTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (indexTable.getSelectedColumn() == 0) {
+                    for (int i = 0; i < indexTable.getModel().getRowCount(); i++) {
+                        if (i != indexTable.getSelectedRow() && !isMultiSelect.isSelected()) {
+                            indexTable.getModel().setValueAt(false, i, 0);
+                        }
+                    }
+                }
+            }
+        });
         indexTable.setModel(new DefaultTableModel() {
 
             private static final long serialVersionUID = 1L;
@@ -119,8 +135,12 @@ public class IndexSelectDialog extends JDialog {
                 IndexSelectDialog.this.setVisible(false);
             }
         });
-        cancelBtn.setBounds(285, 268, 93, 23);
+        cancelBtn.setBounds(287, 268, 93, 23);
         getContentPane().add(cancelBtn);
+        
+        isMultiSelect = new JCheckBox("多选");
+        isMultiSelect.setBounds(287, 239, 103, 23);
+        getContentPane().add(isMultiSelect);
     }
 
     public void initData() {
@@ -160,5 +180,4 @@ public class IndexSelectDialog extends JDialog {
     public void setSelectedIndexs(List<String> selectedIndexs) {
         this.selectedIndexs = selectedIndexs;
     }
-
 }
