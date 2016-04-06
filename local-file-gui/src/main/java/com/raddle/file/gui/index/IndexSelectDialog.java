@@ -64,12 +64,13 @@ public class IndexSelectDialog extends JDialog {
         indexTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                if (indexTable.getSelectedColumn() == 0) {
-                    for (int i = 0; i < indexTable.getModel().getRowCount(); i++) {
-                        if (i != indexTable.getSelectedRow() && !isMultiSelect.isSelected()) {
-                            indexTable.getModel().setValueAt(false, i, 0);
-                        }
+                for (int i = 0; i < indexTable.getModel().getRowCount(); i++) {
+                    if (i != indexTable.getSelectedRow() && !isMultiSelect.isSelected()) {
+                        indexTable.getModel().setValueAt(false, i, 0);
                     }
+                }
+                if (indexTable.getSelectedRow() != -1) {
+                    indexTable.getModel().setValueAt(true, indexTable.getSelectedRow(), 0);
                 }
             }
         });
