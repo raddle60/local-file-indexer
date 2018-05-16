@@ -846,14 +846,14 @@ public class SearchPane extends JPanel {
                                     byte[] bytes = FileUtils.readFileToByteArray(file);
                                     String content = new String(bytes, StringUtils.defaultIfBlank(CharSetUtils.detectCharset(bytes), "ISO-8859-1"));
                                     if (StringUtils.isNotEmpty(resultExcludeTxt.getText())) {
-                                        if (content.contains(resultExcludeTxt.getText()) || name.contains(resultExcludeTxt.getText())
-                                                || path.contains(resultExcludeTxt.getText())) {
+                                        if (StringUtils.containsIgnoreCase(content, resultExcludeTxt.getText()) || StringUtils.containsIgnoreCase(name, resultExcludeTxt.getText())
+                                                || StringUtils.containsIgnoreCase(path, resultExcludeTxt.getText())) {
                                             continue;
                                         }
                                     }
                                     if (StringUtils.isNotEmpty(resultKeyword.getText())) {
-                                        if (content.contains(resultKeyword.getText()) || name.contains(resultKeyword.getText())
-                                                || path.contains(resultKeyword.getText())) {
+                                        if (StringUtils.containsIgnoreCase(content, resultKeyword.getText()) || StringUtils.containsIgnoreCase(name, resultKeyword.getText())
+                                                || StringUtils.containsIgnoreCase(path, resultKeyword.getText())) {
                                             matchedResults.add(config);
                                         }
                                     } else {
