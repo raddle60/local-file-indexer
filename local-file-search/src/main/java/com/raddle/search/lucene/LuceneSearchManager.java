@@ -64,7 +64,7 @@ public class LuceneSearchManager implements SearchManager {
     }
 
     @Override
-    public SearchResult search(String keywords) {
+    public SearchResult search(String keywords, String extension) {
         IndexSearcher searcher = new IndexSearcher(reader);
         FullTwoTokenAnalyzer analyzer = new FullTwoTokenAnalyzer(Version.LUCENE_42);
         analyzer.setForSearch(true);
@@ -90,6 +90,16 @@ public class LuceneSearchManager implements SearchManager {
             booleanQuery.add(booleanNameQuery, BooleanClause.Occur.SHOULD);
             booleanQuery.add(booleanContentQuery, BooleanClause.Occur.SHOULD);
             booleanQuery.add(booleanPathQuery, BooleanClause.Occur.SHOULD);
+            if (StringUtils.isNotEmpty(extension)) {
+                BooleanQuery booleanQueryPre = booleanQuery;
+                BooleanQuery booleanExtensionQuery = new BooleanQuery();
+                booleanExtensionQuery.add(new TermQuery(new Term(IndexedField.EXTENSION.getCode(), extension)), BooleanClause.Occur.MUST);
+                
+                // 重新构建2个条件的查询
+                booleanQuery = new BooleanQuery();
+                booleanQuery.add(booleanQueryPre, BooleanClause.Occur.MUST);
+                booleanQuery.add(booleanExtensionQuery, BooleanClause.Occur.MUST);
+            }
             //System.out.println(tokens);
             //System.out.println(booleanQuery);
             TopDocs results = searcher.search(booleanQuery, 500);
@@ -110,6 +120,8 @@ public class LuceneSearchManager implements SearchManager {
             return result;
         } catch (Exception e) {
             throw new RuntimeException("搜索失败," + e.getMessage(), e);
+        } finally {
+            analyzer.close();
         }
     }
 

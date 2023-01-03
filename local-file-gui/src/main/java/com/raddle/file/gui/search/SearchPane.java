@@ -111,6 +111,7 @@ public class SearchPane extends JPanel {
     private JMenuItem copyFilePath;
     private JLabel label_1;
     private JTextField resultExcludeTxt;
+    private JTextField extensionTxt;
 
     /**
      * Create the panel.
@@ -147,7 +148,7 @@ public class SearchPane extends JPanel {
                 search();
             }
         });
-        searchBtn.setBounds(412, 6, 93, 23);
+        searchBtn.setBounds(546, 6, 93, 23);
         add(searchBtn);
 
         JSplitPane splitPane = new JSplitPane();
@@ -491,7 +492,7 @@ public class SearchPane extends JPanel {
                 refreshIndex();
             }
         });
-        refreshBtn.setBounds(515, 6, 93, 23);
+        refreshBtn.setBounds(649, 6, 93, 23);
         add(refreshBtn);
 
         JButton button = new JButton("选择索引...");
@@ -513,11 +514,11 @@ public class SearchPane extends JPanel {
                 refreshIndex();
             }
         });
-        button.setBounds(618, 6, 93, 23);
+        button.setBounds(752, 6, 115, 23);
         add(button);
 
         countLeb = new JLabel("结果数：");
-        countLeb.setBounds(722, 10, 250, 15);
+        countLeb.setBounds(877, 10, 250, 15);
         add(countLeb);
 
         resultKeyword = new JTextField();
@@ -586,6 +587,15 @@ public class SearchPane extends JPanel {
         resultExcludeTxt.setBounds(347, 35, 205, 21);
         add(resultExcludeTxt);
         resultExcludeTxt.setColumns(10);
+        
+        JLabel lblNewLabel = new JLabel("文件后缀");
+        lblNewLabel.setBounds(415, 10, 58, 15);
+        add(lblNewLabel);
+        
+        extensionTxt = new JTextField();
+        extensionTxt.setBounds(467, 7, 69, 21);
+        add(extensionTxt);
+        extensionTxt.setColumns(10);
 
         addMouseListener(new MouseAdapter() {
 
@@ -626,7 +636,7 @@ public class SearchPane extends JPanel {
             return;
         }
         long start = System.currentTimeMillis();
-        searchResult = luceneSearchManager.search(keywordTxt.getText());
+        searchResult = luceneSearchManager.search(keywordTxt.getText(),extensionTxt.getText());
         currentResults = new ArrayList<Map<IndexedField, Object>>(searchResult.getResults());
         long spentTime = System.currentTimeMillis() - start;
         List<Map<IndexedField, Object>> results = searchResult.getResults();

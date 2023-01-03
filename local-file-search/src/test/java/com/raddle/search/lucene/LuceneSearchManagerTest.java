@@ -22,7 +22,7 @@ public class LuceneSearchManagerTest {
 
     @Test
     public void testSearch() {
-        SearchResult search = searchManager.search("StopwordAnalyzerBase NoSymbolTokenizer");
+        SearchResult search = searchManager.search("StopwordAnalyzerBase NoSymbolTokenizer","");
         System.out.println(search.getResults());
     }
 }
