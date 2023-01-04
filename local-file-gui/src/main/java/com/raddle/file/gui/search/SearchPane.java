@@ -58,7 +58,6 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.fife.ui.rtextarea.SearchContext;
 import org.fife.ui.rtextarea.SearchEngine;
-import org.omg.CORBA.BooleanHolder;
 
 import com.raddle.config.file.JsonFileConfigManager;
 import com.raddle.file.gui.index.IndexSelectDialog;
@@ -75,6 +74,7 @@ import com.raddle.swing.layout.LayoutUtils;
 import com.raddle.swing.progress.Progress;
 import com.raddle.swing.progress.ProgressUtils;
 import com.raddle.swing.progress.single.ProgressCallback;
+import com.raddle.util.ObjectHolder;
 
 public class SearchPane extends JPanel {
 
@@ -101,7 +101,7 @@ public class SearchPane extends JPanel {
     private List<Map<IndexedField, Object>> currentResults = null;
     private SearchContext currentSearchContext = new SearchContext();
     private JButton searchInResultResetBtn;
-    private BooleanHolder isSearchingInResult = new BooleanHolder();
+    private ObjectHolder<Boolean> isSearchingInResult = new ObjectHolder<Boolean>(Boolean.FALSE);
     private int inResultSearchTimes = 0;
     private JLabel charsetLeb;
     private final JPopupMenu resultTableMenu = new JPopupMenu();

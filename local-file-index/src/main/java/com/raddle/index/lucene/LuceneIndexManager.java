@@ -28,7 +28,6 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import org.omg.CORBA.IntHolder;
 
 import com.raddle.config.ConfigManager;
 import com.raddle.index.IndexManager;
@@ -38,6 +37,7 @@ import com.raddle.index.enums.IndexedField;
 import com.raddle.index.lucene.analyzer.FullTwoTokenAnalyzer;
 import com.raddle.index.observer.ProgressObserver;
 import com.raddle.index.util.CharSetUtils;
+import com.raddle.util.ObjectHolder;
 
 /**
  * 类LuceneIndexManager.java的实现描述：
@@ -71,7 +71,7 @@ public class LuceneIndexManager implements IndexManager {
         final Set<String> textFileExts = unionCollection(globalConfig.getTxtFileExts());
         final Set<String> ignoreFileNames = unionCollection(globalConfig.getIgnoreFiles(), indexConfig.getIgnoreFiles());
         final Set<String> ignoreDirNames = unionCollection(globalConfig.getIgnoreDirs(), indexConfig.getIgnoreDirs());
-        final IntHolder total = new IntHolder();
+        final ObjectHolder<Integer> total = new ObjectHolder<Integer>(0);
         Collection<File> matchedFiles = null;
         try {
             matchedFiles = FileUtils.listFiles(docDirFile, new AbstractFileFilter() {
