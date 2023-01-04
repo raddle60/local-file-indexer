@@ -60,7 +60,7 @@
 		<dependency>
 			<groupId>com.fifesoft</groupId>
 			<artifactId>rsyntaxtextarea</artifactId>
-			<version>2.5.6</version>
+			<version>3.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.raddle.swing</groupId>
