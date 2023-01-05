@@ -652,10 +652,6 @@ public class SearchPane extends JPanel {
         List<Map<IndexedField, Object>> results = searchResult.getResults();
         int totalCount = searchResult.getTotalCount();
         refreshResultTable(results, totalCount, spentTime);
-        // 默认选中第一个
-        if(results.size() > 0) {
-            resultTable.setRowSelectionInterval(0, 0);
-        }
         searchInResultBtn.setEnabled(true);
         //
         currentSearchContext.setSearchFor(keywordTxt.getText());
@@ -669,6 +665,10 @@ public class SearchPane extends JPanel {
         fileKeyworkTxt.setText(keywordTxt.getText());
         inResultSearchTimes = 0;
         searchInResultBtn.setText("结果内搜索");
+        // 默认选中第一个
+        if(results.size() > 0) {
+            resultTable.setRowSelectionInterval(0, 0);
+        }
     }
 
     private void refreshResultTable(List<Map<IndexedField, Object>> results, int totalCount, long spentTime) {
