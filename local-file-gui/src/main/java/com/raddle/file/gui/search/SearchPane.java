@@ -593,6 +593,16 @@ public class SearchPane extends JPanel {
         add(lblNewLabel);
         
         extensionTxt = new JTextField();
+        extensionTxt.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    search();
+                }
+            }
+
+        });
         extensionTxt.setBounds(467, 7, 69, 21);
         add(extensionTxt);
         extensionTxt.setColumns(10);
@@ -642,6 +652,10 @@ public class SearchPane extends JPanel {
         List<Map<IndexedField, Object>> results = searchResult.getResults();
         int totalCount = searchResult.getTotalCount();
         refreshResultTable(results, totalCount, spentTime);
+        // 默认选中第一个
+        if(results.size() > 0) {
+            resultTable.setRowSelectionInterval(0, 0);
+        }
         searchInResultBtn.setEnabled(true);
         //
         currentSearchContext.setSearchFor(keywordTxt.getText());
